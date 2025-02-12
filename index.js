@@ -1,11 +1,16 @@
 // Axios serve para fazer requisições HTTP para a API da Binance
 const axios = require('axios');
+const apiKeys = require('./environments');
+const crypto = require('crypto');
 // Define valor de compra e venda de BTC
 const SYMBOL = 'BTCUSDT';
 const BUY_PRICE = 95100; 
 const SELL_PRICE = 97100;
 const PERIOD = 14;
-const API_URL_TESTE =  "https://api.binance.com"; //`https://testnet.binance.vision`;
+const QUANTITY = 0.001;
+
+// API_URLS
+const API_URL_TESTE = `https://testnet.binance.vision`;
 const API_URL = `https://api.binance.com`;
 
 let isOpened = false;
@@ -46,6 +51,34 @@ function RSI(prices, period){
     return 100 - (100 / (1 + rs)); 
 }
 
+async function newOrder(symbol, quantity, side){
+    const order = {symbol, quantity, side};
+    order.type = "MARKET";
+    order.timestamp = Date.now();
+    
+    // API_KEY e API_SECRET são as chaves da sua conta na Binance, e não pode ser compartilhada 
+    //no caso de teste é necessário criar uma conta na testnet binance e pegar as chaves de teste
+    const signature = crypto.createHmac('sha256', apiKeys.SECRET_KEY)
+    .update(new URLSearchParams(order).toString())
+    .digest('hex');
+
+    order.signature = signature;
+
+    try {
+        const {data} = await axios.post(API_URL_TESTE + '/api/v3/order', new URLSearchParams(order).toString(),
+         {
+            headers: {
+                'X-MBX-APIKEY': apiKeys.API_KEY
+            }
+         });
+         console.log(data);
+         
+    } catch (error) {
+        console.error(error.response.data);
+        
+    }
+}
+
 async function start(){
   const {data} = await axios.get(API_URL_TESTE+`/api/v3/klines?limit=1000&interval=15m&symbol=${SYMBOL}`)
   const candle = data[data.length - 1]
@@ -56,30 +89,51 @@ async function start(){
     //console.clear();
     console.log("Price: " + lastPrice);
     console.log("RSI: " + rsi);
+    
+    await newOrder(SYMBOL, QUANTITY, 'BUY');
+ 
+    // if(rsi < 30  && isOpened == false){
+    //     console.log("Sobrevendido, hora de comprar");
+            
+    //     isOpened = true;
+    
+    //     newOrder(SYMBOL, QUANTITY, 'BUY');
 
-    let compras = 0, vendas = 0;
+    //   }else if(rsi > 70 && isOpened == true){
+
+    //     console.log("Sobrecomprado, hora de vender");
+    //     newOrder(SYMBOL, QUANTITY, 'SELL');
+    //     isOpened = false;
+    
+    //   }else{
+    //     console.log("Aguardando...");
+    //   }
 
 
-  if(rsi < 30  && isOpened == false){
-    console.log("Sobrevendido, hora de comprar");
-    console.log("Comprando...");
-        
-    isOpened = true;
-    compras++;
-    console.log("Compras: " + compras);
-
-  }else if(rsi > 70 && isOpened == true){
-    console.log("Sobrecomprado, hora de vender");
-    console.log("Vendendo...");
-    isOpened = false;
-
-    vendas++;
-    console.log("Vendas: " + vendas);
-
-  }else{
-    console.log("Aguardando...");
-  }
 }
 setInterval(start, 3000);
 
 start();
+
+
+
+
+//   if(rsi < 30  && isOpened == false){
+//     console.log("Sobrevendido, hora de comprar");
+//     console.log("Comprando...");
+        
+//     isOpened = true;
+//     compras++;
+//     console.log("Compras: " + compras);
+
+//   }else if(rsi > 70 && isOpened == true){
+//     console.log("Sobrecomprado, hora de vender");
+//     console.log("Vendendo...");
+//     isOpened = false;
+
+//     vendas++;
+//     console.log("Vendas: " + vendas);
+
+//   }else{
+//     console.log("Aguardando...");
+//   }
