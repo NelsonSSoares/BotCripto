@@ -114,3 +114,25 @@ setInterval(start, 3000);
 
 start();
 
+
+
+
+//   if(rsi < 30  && isOpened == false){
+//     console.log("Sobrevendido, hora de comprar");
+//     console.log("Comprando...");
+        
+//     isOpened = true;
+//     compras++;
+//     console.log("Compras: " + compras);
+
+//   }else if(rsi > 70 && isOpened == true){
+//     console.log("Sobrecomprado, hora de vender");
+//     console.log("Vendendo...");
+//     isOpened = false;
+
+//     vendas++;
+//     console.log("Vendas: " + vendas);
+
+//   }else{
+//     console.log("Aguardando...");
+//   }
