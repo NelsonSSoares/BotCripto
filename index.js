@@ -90,24 +90,24 @@ async function start(){
     console.log("Price: " + lastPrice);
     console.log("RSI: " + rsi);
     
-    await newOrder(SYMBOL, QUANTITY, 'BUY');
+    //await newOrder(SYMBOL, QUANTITY, 'BUY');
  
-    // if(rsi < 30  && isOpened == false){
-    //     console.log("Sobrevendido, hora de comprar");
+    if(rsi < 30  && isOpened == false){
+        console.log("Sobrevendido, hora de comprar");
             
-    //     isOpened = true;
+        isOpened = true;
     
-    //     newOrder(SYMBOL, QUANTITY, 'BUY');
+        newOrder(SYMBOL, QUANTITY, 'BUY');
 
-    //   }else if(rsi > 70 && isOpened == true){
+      }else if(rsi > 70 && isOpened == true){
 
-    //     console.log("Sobrecomprado, hora de vender");
-    //     newOrder(SYMBOL, QUANTITY, 'SELL');
-    //     isOpened = false;
+        console.log("Sobrecomprado, hora de vender");
+        newOrder(SYMBOL, QUANTITY, 'SELL');
+        isOpened = false;
     
-    //   }else{
-    //     console.log("Aguardando...");
-    //   }
+      }else{
+        console.log("Aguardando...");
+      }
 
 
 }
